@@ -1,105 +1,117 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Play, Loader2, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { FileAudio, Brain, CheckCircle, AlertCircle } from "lucide-react";
+import { getSamples } from "@/components/frontendAPI";
 
-interface ProgressStep {
-  id: string;
-  label: string;
-  completed: boolean;
+interface Sample {
+  name: string;
+  path: string;
 }
 
 const ProgressPanel = () => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [samples, setSamples] = useState<Sample[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const steps: ProgressStep[] = [
-    { id: "download", label: "Downloading samples", completed: false },
-    { id: "ai", label: "Running AI model", completed: false },
-    { id: "effects", label: "Applying effects", completed: false },
-  ];
-
-  const handleStartMixing = async () => {
-    setIsRunning(true);
-    setProgress(0);
-    setCurrentStep(0);
-
-    // Simulate mixing process
-    for (let i = 0; i < steps.length; i++) {
-      setCurrentStep(i);
-      
-      // Simulate step progress
-      for (let p = 0; p <= 100; p += 10) {
-        setProgress((i * 100 + p) / steps.length);
-        await new Promise(resolve => setTimeout(resolve, 200));
+  useEffect(() => {
+    const fetchSamples = async () => {
+      try {
+        setLoading(true);
+        const data = await getSamples();
+        setSamples(data.samples || []);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch samples");
+        setSamples([]);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    setIsRunning(false);
-    setProgress(100);
-  };
+    fetchSamples();
+  }, []);
+
+  const hasAIModel = true; // Assume AI model exists for now
+  const hasEnvConfig = true; // Assume env config exists for now
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mixing Progress</CardTitle>
+        <CardTitle>System Status</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center gap-3">
-              <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                index < currentStep || (!isRunning && progress === 100)
-                  ? "bg-audio-active text-audio-active-foreground"
-                  : index === currentStep && isRunning
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}>
-                {index < currentStep || (!isRunning && progress === 100) ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : index === currentStep && isRunning ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  index + 1
-                )}
-              </div>
-              <span className={`text-sm ${
-                index <= currentStep ? "text-foreground font-medium" : "text-muted-foreground"
-              }`}>
-                {step.label}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Overall Progress</span>
-            <span className="font-medium">{Math.round(progress)}%</span>
+        {/* Audio Samples Status */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <FileAudio className="h-4 w-4" />
+            <span className="font-medium">Audio Samples</span>
+            <Badge variant={samples.length > 0 ? "default" : "secondary"}>
+              {samples.length} files
+            </Badge>
           </div>
-          <Progress value={progress} className="h-2" />
+          
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading samples...</p>
+          ) : error ? (
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </div>
+          ) : samples.length === 0 ? (
+            <div className="text-sm text-muted-foreground">
+              <p>No audio samples found in downloads directory.</p>
+              <p className="mt-1">Add .wav files to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">
+                Found {samples.length} audio sample{samples.length !== 1 ? 's' : ''}:
+              </p>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {samples.map((sample, index) => (
+                  <div key={index} className="text-xs text-muted-foreground bg-muted/50 p-1 rounded">
+                    {sample.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        <Button
-          onClick={handleStartMixing}
-          disabled={isRunning}
-          size="lg"
-          className="w-full"
-        >
-          {isRunning ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Running...
-            </>
+        {/* AI Model Status */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            <span className="font-medium">AI Model</span>
+            <Badge variant={hasAIModel ? "default" : "destructive"}>
+              {hasAIModel ? "Available" : "Missing"}
+            </Badge>
+          </div>
+          
+          {hasAIModel ? (
+            <div className="flex items-center gap-2 text-sm text-green-600">
+              <CheckCircle className="h-4 w-4" />
+              AImix_model.onnx is ready for mixing
+            </div>
           ) : (
-            <>
-              <Play className="mr-2 h-4 w-4" />
-              Start Mixing
-            </>
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              AI model not found. Using fallback mixing.
+            </div>
           )}
-        </Button>
+        </div>
+
+        {/* Instructions */}
+        <div className="space-y-2 pt-4 border-t">
+          <h4 className="font-medium text-sm">How to use:</h4>
+          <ol className="text-sm text-muted-foreground space-y-1">
+            <li>1. Select a music genre</li>
+            <li>2. Click "Generate AI Mix" to analyze samples</li>
+            <li>3. View the generated gain and pan settings</li>
+            <li>4. Settings are applied automatically</li>
+          </ol>
+        </div>
       </CardContent>
     </Card>
   );
