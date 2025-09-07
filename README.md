@@ -1,5 +1,5 @@
 # Mixgenie: An AI Mixing Assistant for Audiotool
-![alt text](https://github.com/tiffjai/mixgenie/blob/main/image.jpg?raw=true)
+![Mixgenie Logo](https://github.com/tiffjai/mixgenie/blob/main/frontend/src/images/mixgenie.png?raw=true)
 
 This project contains a TypeScript script for interacting with the Audiotool Nexus API. The main functionality is to list and optionally download all samples referenced by an Audiotool online project. Pass the tracks and metadata through a deep learning ONNX checkpoint, and apply the predicted gain and pan values back to the Audiotools UI. This allows a user to create a gain-staged mix that can be further fine-tuned within the workflow. 
 
