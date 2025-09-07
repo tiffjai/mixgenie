@@ -1,0 +1,24 @@
+{
+  "name": "audiotooltryout",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@audiotool/nexus": "file:nexus.tgz",
+    "audio-decode": "^2.2.3",
+    "dotenv": "^17.2.2",
+    "onnxruntime-node": "^1.22.0-rev",
+    "wav-decoder": "^1.3.0"
+  }
+}

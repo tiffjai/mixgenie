@@ -1,0 +1,72 @@
+{
+  "name": "@audiotool/nexus",
+  "version": "0.0.1",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./document": {
+      "types": "./dist/document/index.d.ts",
+      "import": "./dist/document/index.js"
+    },
+    "./entity-types": {
+      "types": "./dist/entity-types.d.ts",
+      "import": "./dist/entity-types.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    },
+    "./api-types": {
+      "types": "./dist/api-types.d.ts",
+      "import": "./dist/api-types.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && npm pack",
+    "docs": "typedoc",
+    "codegen": "buf generate protos --template proto.buf.gen.yaml && buf generate protos --template nexus.buf.gen.yaml && buf generate protos --template proto2.buf.gen.yaml && node scripts/generate-protobuf-exports.js && node scripts/generate-protobuf-exports-services.js",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.56.0",
+    "@bufbuild/protoplugin": "1.10.0",
+    "@microsoft/api-documenter": "^7.26.32",
+    "@microsoft/api-extractor": "^7.52.11",
+    "@prettier/sync": "^0.6.1",
+    "@types/node": "^24.3.0",
+    "@types/toposort": "^2.0.7",
+    "@types/uuid": "^10.0.0",
+    "glob": "^11.0.3",
+    "tsx": "^4.0.0",
+    "typedoc": "^0.28.10",
+    "typedoc-plugin-mdn-links": "^5.0.8",
+    "typedoc-plugin-missing-exports": "^4.1.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.0",
+    "vitest": "^3.2.4"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@bufbuild/protobuf": "1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-web": "^1.4.0",
+    "@types/js-cookie": "^3.0.6",
+    "js-cookie": "^3.0.5",
+    "toposort": "^2.0.2",
+    "utility-types": "^3.11.0",
+    "uuid": "^11.1.0",
+    "zod": "^4.0.17"
+  }
+}
